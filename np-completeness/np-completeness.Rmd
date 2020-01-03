@@ -26,7 +26,7 @@ Given a problem, how do we know whether we can *ever* design an algorithm to sol
 # Types of problems
 
 **Search probem**: Find a solution that satisfies given conditions.  
-e.g. Find a path in graph$G$ from vertex $s$ to $t$.  
+e.g. Find a path in graph $G$ from vertex $s$ to $t$.  
 e.g. Sort a list (i.e. find a sorted list).
 
 **Optimization problem**: Find a solution that satisfies given conditions and optimizes an objective function.  
@@ -34,7 +34,7 @@ e.g. Minimize $f(x)$ s.t. $g(x) < b$.
 
 **Decision problem**: Answer a yes-or-no question.^[
 Typically, decision problems ask whether a solution exists for a search or optimization problem.]  
-e.g. Is there a path from vertex $s$ to $t$ in a graph $G$?  
+e.g. Is there a path from vertex $s$ to $t$ in a graph $G$?
 
 Given a problem, we can reframe it as a decision problem.
 Then, we will determine which **complexity classes** the problem falls into.^[
@@ -59,12 +59,17 @@ given the input $x$, in polynomial time.
 
 **NP-hard**:  
 (Informal definition) Decision problems that as hard as the hardest problems in **NP**.^[
-A **NP-hard** problem may be outside of **NP**. Some **NP-hard** problems are not verifiable in polynomial time.]
+A **NP-hard** problem may be outside of **NP**: some **NP-hard** problems are not verifiable in polynomial time.]
 An algorithm that solves a **NP-hard** problem can be used to solve all problems in **NP** in polynomial time.
 
 **NP-complete**:  
-Decision problems into which all **NP** problems can be transformed efficiently (in polynomial time).^[
-Solving a **NP-complete** problem in polynomial time completes the task of solving all **NP** problems in polynomial time.]
+(Informal definition) Decision problems that can be verified efficiently
+and into which all **NP** problems can be transformed efficiently.^[
+Solving a **NP-complete** problem in polynomial time *completes* the task of solving all **NP** problems in polynomial time.]
+
+\bigskip
+
+*Question*: Are these complexity classes mutually exclusive?
 
 ----
 
@@ -91,7 +96,7 @@ There are $O(\sqrt{x})$ candidates to try, so the algorithm is exponential in th
 
 **Example 2**. VERTEX-COVER decision problem:  
 Given undirected graph $G$ and positive integer $x$, does $G$ contain a vertex cover of size $k$?  
-A vertex cover is a set of vertices s.t. each edge of $G$ has at least one endpoint in $C$.
+A vertex cover is a set of vertices s.t. each edge in $G$ has at least one endpoint in $C$.
 
 Show that VERTEX-COVER is in **NP**.
 
@@ -128,8 +133,11 @@ $D_1$ in polynomial time.
 
 Since $f$ is computable in polynomial time of $|x_1|$, the size of $f(x_1)$ is polynomial in $|x_1|$. The runtime of $A_1 = A_2(f(x_1))$ is polynomial in $f(x_1)$. Therefore, $A_1$ runs in polynomial time on an input whose size is polynomial of $|x_1|$, meaning that $A_1$ runs in polynomial time of $|x_1|$. $A_1$ is thus a polynomial time algorithm for $D_1$, so $D_1 \in \textbf{P}$. \qed
 
-**Corollary**. If $D_1 \le_p D_2$ and $D_1 \notin \textbf{P}$, then $D_2 \notin \textbf{P}$.^[
-We can thus establish the intractability of a problem $D$ by showing that a known intractable problem reduces to $D$.]
+\bigskip
+
+**Corollary**. If $D_1 \le_p D_2$ and $D_1 \notin \textbf{P}$, then $D_2 \notin \textbf{P}$.
+
+*Question*: How do we use this to prove that a problem $D$ is intractable?
 
 ----
 
@@ -140,7 +148,7 @@ $X \le_p D$ for all $X \in \textbf{NP}$.
 
 *Remark*: An algorithm $A_h$ that solves $H \in \textbf{NP}$ can be used to solve *any* decision problem $X \in \textbf{NP}$ by polynomial-time reduction.
 
-Which **NP-hard** problems should we try to solve first?
+Which **NP-hard** problems should we try to solve first?  
 
 \bigskip
 
@@ -148,11 +156,12 @@ Which **NP-hard** problems should we try to solve first?
 $D \in \textbf{NP}$ and $X \le_p D$ for all $X \in \textbf{NP}$.^[
 Equivalently, a **NP-complete** problem is in both **NP** and **NP-hard**.]
 
-\bigskip
-
 Once we solve *any* **NP-complete** problem in polynomial time, we can solve all **NP** problems in polynomial time.
 
-**Boolean Satisfiability (SAT) decision problem**: Given a boolean expression $F$, is there some assignment of truth-values to the variables that will make $F$ true? i.e. Is $F$ *satisfiable*?
+\bigskip
+
+**Boolean Satisfiability (SAT) decision problem**:  
+Given a boolean expression $F$, is there some assignment of truth-values to the variables that will make $F$ true? i.e. Is $F$ *satisfiable*?
 
 **Cook's Theorem**. SAT is **NP-complete**.
 
@@ -160,7 +169,8 @@ Once we solve *any* **NP-complete** problem in polynomial time, we can solve all
 
 # Does **P** equal **NP**?
 
-**Theorem**. Suppose $C \in \textbf{NP-complete}$. Then $C \in \textbf{P}$ iff $\textbf{P} = \textbf{NP}$.
+**Theorem**. Suppose $C \in \textbf{NP-complete}$.
+Then $C \in \textbf{P} \; \Leftrightarrow \; \textbf{P} = \textbf{NP}$.
 
 **Proof**.  
 ($\Rightarrow$) Suppose $\textbf{P} = \textbf{NP}$.  
@@ -177,6 +187,11 @@ $\; \Rightarrow \;$ $D \in \textbf{P}$ for all $D \in \textbf{NP}$
 $\; \Rightarrow \;$ $\textbf{NP} \subseteq \textbf{P}$  
 $\; \Rightarrow \;$ $\textbf{P} = \textbf{NP}$ (since $\textbf{P} \subseteq \textbf{NP}$). \qed
 
+*Question*: How many **NP-complete** problems do we need to solve efficiently
+in order to solve all problems that are verifiable efficiently?
+
+\bigskip
+
 **Corollary**. If $\textbf{P} \neq \textbf{NP}$ and $C \in \textbf{NP-complete}$, then $C \notin \textbf{P}$.
 
 Since no polynomial-time algorithm is currently known to exist for *any* **NP-complete** problem, it is unknown whether $\textbf{P} = \textbf{NP}$.^[
@@ -184,7 +199,7 @@ There is an outstanding Millennium prize for resolving whether $\textbf{P} = \te
 
 ----
 
-# Belonging to **P**?
+# Probable intractability
 
 When we do give up trying to find an efficient^[
 worst-case polynomial-time] algorithm?
@@ -193,13 +208,19 @@ worst-case polynomial-time] algorithm?
 then $C \notin \textbf{P}$.^[proof by contradication]
 
 If we show that a problem is **NP-hard**, then we would infer
-that the problem *probably* does not have a polynomial-time algorithm?
+that the problem *probably* will not have a polynomial-time algorithm.
 
-**Thereom** (NP-hardness). If $H \in \textbf{NP-hard}$ and $H \le_p D$, then $D \in \textbf{NP-hard}$.
+*Question*: Why can we not say this with absolute certainty?
+
+\bigskip
+
+**Thereom** (NP-hardness).  
+If $H \in \textbf{NP-hard}$ and $H \le_p D$, then $D \in \textbf{NP-hard}$.
 
 **Proof**. $H \in \textbf{NP-hard}$
 $\; \Rightarrow \;$ $X \le_p H$ for all $X \in \textbf{NP}$  
 $\; \Rightarrow \;$ $X \le_p H \le_p D$ for all $X \in \textbf{NP}$  
 $\; \Rightarrow \;$ $X \le_p D$ for all $X \in \textbf{NP}$
 $\; \Rightarrow \;$ $D \in \textbf{NP}$. \qed
+
 
