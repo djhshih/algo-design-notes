@@ -1,0 +1,205 @@
+---
+title: "NP-completeness"
+author: "David J. H. Shih"
+date: "`r Sys.Date()`"
+output:
+  tufte::tufte_handout:
+    includes:
+      in_header: preamble.tex
+    latex_engine: xelatex
+  tufte::tufte_book:
+    latex_engine: xelatex
+    includes:
+      in_header: preamble.tex
+  tufte::tufte_html: default
+---
+
+\setlength{\parindent}{0pt}
+
+# Motivation
+
+Is there a core class of problems that, when solved, can help us to 
+solve a larger class of problems efficiently^[in worst-case polynomial time]?
+
+Given a problem, how do we know whether we can *ever* design an algorithm to solve it efficiently?
+
+# Types of problems
+
+**Search probem**: Find a solution that satisfies given conditions.  
+e.g. Find a path in graph$G$ from vertex $s$ to $t$.  
+e.g. Sort a list (i.e. find a sorted list).
+
+**Optimization problem**: Find a solution that satisfies given conditions and optimizes an objective function.  
+e.g. Minimize $f(x)$ s.t. $g(x) < b$.
+
+**Decision problem**: Answer a yes-or-no question.^[
+Typically, decision problems ask whether a solution exists for a search or optimization problem.]  
+e.g. Is there a path from vertex $s$ to $t$ in a graph $G$?  
+
+Given a problem, we can reframe it as a decision problem.
+Then, we will determine which **complexity classes** the problem falls into.^[
+Here, we will only consider time complexity, but there are other types of complexity, e.g. space complexity.]
+
+Decision problems are "easier" than the corresponding search or optimization problems. If a decision problem is hard, then the more general problem would also be hard.
+
+# Complexity classes
+
+**P** (polynomial):  
+Decision problems that can be solved in polynomial time.^[
+Ideally, we want to classify a problem as either in **P** or not in **P**. Unfortunately, there is no general way of doing this classification.]  
+i.e. There is a polynomial-time algorithm to solve the problem.
+
+**NP** (*non-deterministic* polynomial):  
+Decision problems that can be verified in polynomial time.  
+i.e. There is a verifier algorithm $V(x,c)$ that can check whether an candidate solution $c$ is correct^[
+The "verifier" $V$ evaluates the input $x$ and accepts the "certificate" $c$ if the solution encoded in $c$ is correct.]
+given the input $x$, in polynomial time.
+
+*Remark*: **P** $\subseteq$ **NP**.
+
+**NP-hard**:  
+(Informal definition) Decision problems that as hard as the hardest problems in **NP**.^[
+A **NP-hard** problem may be outside of **NP**. Some **NP-hard** problems are not verifiable in polynomial time.]
+An algorithm that solves a **NP-hard** problem can be used to solve all problems in **NP** in polynomial time.
+
+**NP-complete**:  
+Decision problems into which all **NP** problems can be transformed efficiently (in polynomial time).^[
+Solving a **NP-complete** problem in polynomial time completes the task of solving all **NP** problems in polynomial time.]
+
+----
+
+# Verifier
+
+**Example 1**. COMPOSITE decision problem:  
+Given positive integer $x$, does $x$ have any factors?
+
+Show that COMPOSITE is in **NP**.
+
+Consider the verifer $V(x, c)$:
+
+- Return (1 < c < x) AND (mod(x, c) == 0)
+
+If $x$ is composite, $V(x, c)$ outputs `yes` for any factor $c$ of $x$.  
+If $x$ is prime, $V(x, c)$ outputs `no` for all $c$.  
+Moreover, since basic arithmetic operations run in polynomial time, 
+$V(x, c)$ runs in polynomial time of $|x|$.
+
+*Remark*: We can solve COMPOSITE with an algorithm that calls the verifier on all numbers between 2 and $\sqrt{x}$. However, this algorithm does not run in polynomial time.^[
+There are $O(\sqrt{x})$ candidates to try, so the algorithm is exponential in the bitsize of $x$: taking $n = \textrm{log}_2(x)$, the time complexity is $O(\sqrt{2^n}) = O(2^{\frac{n}{2}})$.]
+
+\bigskip
+
+**Example 2**. VERTEX-COVER decision problem:  
+Given undirected graph $G$ and positive integer $x$, does $G$ contain a vertex cover of size $k$?  
+A vertex cover is a set of vertices s.t. each edge of $G$ has at least one endpoint in $C$.
+
+Show that VERTEX-COVER is in **NP**.
+
+Consider the verifier $V((G,k), c)$:
+
+- Check that $c$ is a subset of exactly $k$ vertices in $G$;  
+  otherwise, return `no`.
+- If $c$ forms a vertex cover, return `yes`; otherwise, return `no`.
+
+The verifier takes polynomial time in the number of vertices of $G$ (define as $n$) and the number of edges of $G$ (define as $m$).^[
+First step takes $O(k n)$ time, and second step takes $O(k m)$ time,
+so the total is $O(k (m + n))$.]
+
+*Remark*: Again, we can solve VERTEX-COVER with an algorithm that calls the verifier on all possible subsets of vertices in $G$. However, this algorithm does not run in polynomial time.^[
+We can count all possible subsets (a.k.a. the powerset) by considering whether to include or exclude each vertex (2 possibilities per vertex). Thus, there are $2^n$ subsets to try.]
+
+----
+
+# Polynomial-time reduction
+
+**Definition**. If there is a function $f$ that can transform any input for $D_1$ into an input for $D_2$ in polynomial time s.t. the outputs from $D_1$ and $D_2$ are the same, then $D_1$ *polynomial-time reduces* to $D_2$:
+$$
+D_1 \le_p D_2
+$$
+
+Effectively, if we can solve $D_2$ in polynomial time, then we can also solve
+$D_1$ in polynomial time.
+
+\bigskip
+
+**Theorem**. If $D_1 \le_p D_2$ and $D_2 \in \textbf{P}$, then $D_1 \in \textbf{P}$.
+
+**Proof**. Since $D_1 \le_p D_2$, there is a function $f$ for polynomial-time reduction. Since $D_2 \in \textbf{P}$, there is a polynomial algorithm $A_2$ for solving $D_2$. Define an algorithm $A_1(x_1)$ to return $A_2(f(x_1))$.
+
+Since $f$ is computable in polynomial time of $|x_1|$, the size of $f(x_1)$ is polynomial in $|x_1|$. The runtime of $A_1 = A_2(f(x_1))$ is polynomial in $f(x_1)$. Therefore, $A_1$ runs in polynomial time on an input whose size is polynomial of $|x_1|$, meaning that $A_1$ runs in polynomial time of $|x_1|$. $A_1$ is thus a polynomial time algorithm for $D_1$, so $D_1 \in \textbf{P}$. \qed
+
+**Corollary**. If $D_1 \le_p D_2$ and $D_1 \notin \textbf{P}$, then $D_2 \notin \textbf{P}$.^[
+We can thus establish the intractability of a problem $D$ by showing that a known intractable problem reduces to $D$.]
+
+----
+
+# NP-completeness
+
+**Definition**. A decision problem $D$ is **NP-hard** if  
+$X \le_p D$ for all $X \in \textbf{NP}$.
+
+*Remark*: An algorithm $A_h$ that solves $H \in \textbf{NP}$ can be used to solve *any* decision problem $X \in \textbf{NP}$ by polynomial-time reduction.
+
+Which **NP-hard** problems should we try to solve first?
+
+\bigskip
+
+**Definition**. A decision problem $D$ is **NP-complete** if  
+$D \in \textbf{NP}$ and $X \le_p D$ for all $X \in \textbf{NP}$.^[
+Equivalently, a **NP-complete** problem is in both **NP** and **NP-hard**.]
+
+\bigskip
+
+Once we solve *any* **NP-complete** problem in polynomial time, we can solve all **NP** problems in polynomial time.
+
+**Boolean Satisfiability (SAT) decision problem**: Given a boolean expression $F$, is there some assignment of truth-values to the variables that will make $F$ true? i.e. Is $F$ *satisfiable*?
+
+**Cook's Theorem**. SAT is **NP-complete**.
+
+----
+
+# Does **P** equal **NP**?
+
+**Theorem**. Suppose $C \in \textbf{NP-complete}$. Then $C \in \textbf{P}$ iff $\textbf{P} = \textbf{NP}$.
+
+**Proof**.  
+($\Rightarrow$) Suppose $\textbf{P} = \textbf{NP}$.  
+$C \in \textbf{NP-complete}$
+$\; \Rightarrow \;$ $C \in \textbf{NP}$
+$\; \Rightarrow \;$ $C \in \textbf{P}$.
+
+($\Leftarrow$) Suppose $C \in \textbf{P}$.  
+$C \in \textbf{NP-complete}$
+$\; \Rightarrow \;$ $C \in \textbf{NP-hard}$  
+$\; \Rightarrow \;$ $D \le_p C$ for all $D \in \textbf{NP}$  
+$\; \Rightarrow \;$ $D \in \textbf{P}$ for all $D \in \textbf{NP}$
+(since $C \in \textbf{P}$)  
+$\; \Rightarrow \;$ $\textbf{NP} \subseteq \textbf{P}$  
+$\; \Rightarrow \;$ $\textbf{P} = \textbf{NP}$ (since $\textbf{P} \subseteq \textbf{NP}$). \qed
+
+**Corollary**. If $\textbf{P} \neq \textbf{NP}$ and $C \in \textbf{NP-complete}$, then $C \notin \textbf{P}$.
+
+Since no polynomial-time algorithm is currently known to exist for *any* **NP-complete** problem, it is unknown whether $\textbf{P} = \textbf{NP}$.^[
+There is an outstanding Millennium prize for resolving whether $\textbf{P} = \textbf{NP}$.]
+
+----
+
+# Belonging to **P**?
+
+When we do give up trying to find an efficient^[
+worst-case polynomial-time] algorithm?
+
+**Lemma**. If $\textbf{P} \neq \textbf{NP}$ and $C \in \textbf{NP-hard}$, 
+then $C \notin \textbf{P}$.^[proof by contradication]
+
+If we show that a problem is **NP-hard**, then we would infer
+that the problem *probably* does not have a polynomial-time algorithm?
+
+**Thereom** (NP-hardness). If $H \in \textbf{NP-hard}$ and $H \le_p D$, then $D \in \textbf{NP-hard}$.
+
+**Proof**. $H \in \textbf{NP-hard}$
+$\; \Rightarrow \;$ $X \le_p H$ for all $X \in \textbf{NP}$  
+$\; \Rightarrow \;$ $X \le_p H \le_p D$ for all $X \in \textbf{NP}$  
+$\; \Rightarrow \;$ $X \le_p D$ for all $X \in \textbf{NP}$
+$\; \Rightarrow \;$ $D \in \textbf{NP}$. \qed
+
